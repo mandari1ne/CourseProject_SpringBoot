@@ -66,5 +66,26 @@ public class AuthController {
         return "profile";
     }
 
+    @GetMapping("/edit-profile")
+    public String showEditProfileForm(Model model, Principal principal) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        if (user.getUserInfo() == null) {
+            user.setUserInfo(new UserInfo());
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("userInfo", user.getUserInfo());
+
+        return "edit-profile";
+    }
+
+    @PostMapping("/update-profile")
+    public String updateProfile(@ModelAttribute User updatedUser, @ModelAttribute UserInfo updatedUserInfo, Principal principal) {
+        userService.updateUser(principal.getName(), updatedUser, updatedUserInfo);
+        return "redirect:/auth/profile";
+    }
 
 }
