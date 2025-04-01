@@ -13,7 +13,9 @@ public class UserInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fullName;
+    private String surname;
+    private String name;
+    private String patronymic;
     private String department;
     private String position;
     private String email;
