@@ -27,6 +27,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserInfo userInfo;
 
@@ -42,12 +46,12 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return status != Status.BLOCKED;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return status != Status.BLOCKED;
     }
 
     @Override
@@ -57,6 +61,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return status == Status.ACTIVE;
     }
 }
