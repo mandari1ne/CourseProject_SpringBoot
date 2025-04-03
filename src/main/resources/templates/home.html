@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +24,6 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
-            transform: scale(1.02);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
         .btn {
@@ -65,22 +64,33 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <h2 class="mb-4">Добро пожаловать!</h2>
-                    <a th:href="@{/auth/profile}" class="btn btn-primary w-100 mb-3">
-                        Перейти в профиль
-                    </a>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <h2 class="mb-4">Добро пожаловать!</h2>
+
+                <a th:href="@{/auth/profile}" class="btn btn-primary w-100 mb-3">
+                    Перейти в профиль
+                </a>
+
+                <!-- Для обычного пользователя -->
+                <div th:if="${role == 'USER'}">
                     <button class="btn btn-secondary w-100 mb-3">Просмотр заявок на отпуск</button>
                     <button class="btn btn-primary w-100">Добавить заявку на отпуск</button>
-
-                    <a th:href="@{/logout}" class="logout">Выйти</a>
                 </div>
+
+                <!-- Для администратора -->
+                <div th:if="${role == 'ADMIN'}">
+                    <button class="btn btn-secondary w-100 mb-3">Просмотр учетных записей</button>
+                    <button class="btn btn-primary w-100 mb-3">Просмотр заявок на отпуск</button>
+                </div>
+
+                <a th:href="@{/logout}" class="logout">Выйти</a>
             </div>
         </div>
     </div>
+</div>
 
 </body>
 </html>

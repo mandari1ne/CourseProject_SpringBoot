@@ -21,9 +21,13 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            position: relative;
         }
         .card:hover {
-            transform: scale(1.02);
+            /*transform: scale(1.02);*/
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
         h1 {
@@ -41,6 +45,7 @@
             font-weight: bold;
             padding: 12px;
             transition: all 0.3s ease;
+            font-size: 16px;
         }
         .btn-primary {
             background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -65,30 +70,40 @@
         .btn-danger:hover {
             background: linear-gradient(135deg, #c0392b, #e74c3c);
         }
+        .button-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <h1>Личный кабинет</h1>
-                    <p><strong>Логин:</strong> <span th:text="${user.login}"></span></p>
-                    <p><strong>Фамилия:</strong> <span th:text="${userInfo.surname ?: 'Не указано'}"></span></p>
-                    <p><strong>Имя:</strong> <span th:text="${userInfo.name ?: 'Не указано'}"></span></p>
-                    <p><strong>Отчество:</strong> <span th:text="${userInfo.patronymic ?: 'Не указано'}"></span></p>
-                    <p><strong>Email:</strong> <span th:text="${userInfo.email ?: 'Не указано'}"></span></p>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <h1>Личный кабинет</h1>
+                <p><strong>Логин:</strong> <span th:text="${user.login}"></span></p>
+                <p><strong>Фамилия:</strong> <span th:text="${userInfo.surname ?: 'Не указано'}"></span></p>
+                <p><strong>Имя:</strong> <span th:text="${userInfo.name ?: 'Не указано'}"></span></p>
+                <p><strong>Отчество:</strong> <span th:text="${userInfo.patronymic ?: 'Не указано'}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${userInfo.email ?: 'Не указано'}"></span></p>
 
-                    <a href="/auth/edit-profile" class="btn btn-secondary w-100 mb-3">✏️ Редактировать профиль</a>
-                    <a href="/auth/home" class="btn btn-primary w-100 mb-3">🏠 На главную</a>
+                <div class="button-container">
+                    <a href="/auth/edit-profile" class="btn btn-secondary">✏️</a>
+                    <a href="/auth/home" class="btn btn-primary">🏠</a>
                     <form action="/logout" method="post">
-                        <button type="submit" class="btn btn-danger w-100">🚪 Выйти</button>
+                        <button type="submit" class="btn btn-danger">🚪</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 </body>
 </html>

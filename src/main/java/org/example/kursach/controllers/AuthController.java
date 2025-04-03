@@ -46,7 +46,14 @@ public class AuthController {
     }
 
     @GetMapping("/home")
-    public String homePage() {
+    public String homePage(Model model, Principal principal) {
+        if (principal != null) {
+            String login = principal.getName();
+            User user = userService.findByLogin(login)
+                    .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+            model.addAttribute("role", user.getRole().name());
+        }
         return "home";
     }
 
