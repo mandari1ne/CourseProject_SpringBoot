@@ -8,6 +8,8 @@ import org.example.kursach.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 
 import static org.example.kursach.model.Role.USER;
@@ -32,6 +34,10 @@ public class UserService {
 
     public Optional<User> findByLogin(String username) {
         return userRepository.findByLogin(username);
+    }
+
+    public List<User> findAllUsersExcept(String login) {
+        return userRepository.findByLoginNot(login);
     }
 
     public void updateUser(String login, User updatedUser, UserInfo updatedUserInfo) {

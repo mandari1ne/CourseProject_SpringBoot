@@ -82,7 +82,9 @@
 
                 <!-- Для администратора -->
                 <div th:if="${role == 'ADMIN'}">
-                    <button class="btn btn-secondary w-100 mb-3">Просмотр учетных записей</button>
+                    <a th:href="@{/admin/users}" class="btn btn-secondary w-100 mb-3">
+                        Просмотр учетных записей
+                    </a>
                     <button class="btn btn-primary w-100 mb-3">Просмотр заявок на отпуск</button>
                 </div>
 

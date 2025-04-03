@@ -21,11 +21,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
+        // Добавляем префикс ROLE_ к роли из базы данных
+        String role = "ROLE_" + user.getRole().name(); // Предполагается, что role хранится как строка, например, "USER", "ADMIN"
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                Collections.singletonList(new SimpleGrantedAuthority(role))
         );
     }
 }
-
