@@ -51,6 +51,7 @@
             <div class="card bg-white">
                 <h2 class="text-center text-primary">Вход 🔑</h2>
 
+                <div th:if="${param.blocked}" class="error-message">🚫 Ваш аккаунт заблокирован</div>
                 <div th:if="${param.error}" class="error-message">❌ Неверный логин или пароль</div>
                 <div th:if="${param.logout}" class="success-message">✅ Вы успешно вышли из системы</div>
 

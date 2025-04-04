@@ -26,7 +26,7 @@ public class UserService {
             throw new IllegalArgumentException("❌ Пользователь с таким логином уже существует!");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Хешируем пароль
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(USER); // Устанавливаем роль по умолчанию
         user.setStatus(ACTIVE); // Устанавливаем статус по умолчанию
         return userRepository.save(user);
@@ -38,6 +38,14 @@ public class UserService {
 
     public List<User> findAllUsersExcept(String login) {
         return userRepository.findByLoginNot(login);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 
     public void updateUser(String login, User updatedUser, UserInfo updatedUserInfo) {

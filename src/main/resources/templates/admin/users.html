@@ -5,59 +5,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список пользователей</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <style>
         body {
-            background: #f8f9fa;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2); /* Цвета из login.html */
+            font-family: 'Segoe UI', sans-serif;
         }
+
         .container {
-            margin-top: 50px;
+            margin-top: 60px;
+            max-width: 98%;
         }
-        .table {
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        h2 {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
         }
-        th, td {
-            text-align: center;
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .table thead th {
+            background-color: #6a11cb;
+            color: #ffffff;
             vertical-align: middle;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .table {
+            font-size: 0.85rem;
+            table-layout: auto;
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #5a5a89;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #5a5a89;
+        }
+
+        .table th:nth-child(3),
+        .table th:nth-child(4) {
+            width: 160px;
+        }
+
+        .form-select {
+            border-radius: 8px;
+            font-size: 0.8rem;
+            padding: 4px 6px;
+            width: 100%;
+            min-width: 130px;
+        }
+
+        .btn-primary {
+            border-radius: 25px;
+            font-weight: 600;
+            background-color: #6a11cb;
+            border: none;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            transition: 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2575fc;
+        }
+
+        .btn-secondary {
+            margin-top: 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border: none;
+            font-weight: 600;
+            transition: 0.3s ease;
+            font-size: 0.9rem;
+            padding: 8px 20px;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+        }
+
+        .no-access {
+            background: #ffe0e0;
+            padding: 20px;
+            border-radius: 10px;
+            color: #c0392b;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff;
+            padding: 8px 20px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #ff4b2b, #ff416c);
         }
     </style>
+
+    <script>
+        function updateUserStatusAndRole(userId) {
+            const role = document.getElementById(`role-${userId}`).value;
+            const status = document.getElementById(`status-${userId}`).value;
+
+            fetch(`/admin/update-user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ role, status }),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Изменения сохранены!');
+                        window.location.reload();
+                    } else {
+                        alert('Произошла ошибка при сохранении.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при сохранении.');
+                });
+        }
+    </script>
 </head>
 <body>
 
 <div class="container">
-    <h2 class="text-center mb-4">Список пользователей</h2>
+    <h2 class="text-center">👥 Список пользователей</h2>
 
-    <!-- Проверяем роль, если админ, отображаем таблицу пользователей -->
-    <div th:if="${role == 'ROLE_ADMIN'}">
-        <table class="table table-bordered">
-            <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Логин</th>
-                <th>Роль</th>
-                <th>Статус</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.id}"></td>
-                <td th:text="${user.login}"></td>
-                <td th:text="${user.role}"></td>
-                <td th:text="${user.status}"></td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="table-container" th:if="${role == 'ROLE_ADMIN'}">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Логин</th>
+                    <th>Роль</th>
+                    <th>Статус</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Отдел</th>
+                    <th>Должность</th>
+                    <th>Email</th>
+                    <th>Действие</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.login}"></td>
+
+                    <td>
+                        <select class="form-select" th:id="'role-' + ${user.id}">
+                            <option th:value="MANAGER" th:selected="${user.role.name() == 'MANAGER'}">MANAGER</option>
+                            <option th:value="USER" th:selected="${user.role.name() == 'USER'}">USER</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <select class="form-select" th:id="'status-' + ${user.id}">
+                            <option th:value="ACTIVE" th:selected="${user.status.name() == 'ACTIVE'}">ACTIVE</option>
+                            <option th:value="BLOCKED" th:selected="${user.status.name() == 'BLOCKED'}">BLOCKED</option>
+                        </select>
+                    </td>
+
+                    <td th:text="${user.userInfo?.surname ?: ''}"></td>
+                    <td th:text="${user.userInfo?.name ?: ''}"></td>
+                    <td th:text="${user.userInfo?.patronymic ?: ''}"></td>
+                    <td th:text="${user.userInfo?.department ?: ''}"></td>
+                    <td th:text="${user.userInfo?.position ?: ''}"></td>
+                    <td th:text="${user.userInfo?.email ?: ''}"></td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" th:onclick="'updateUserStatusAndRole(' + ${user.id} + ')'">Сохранить</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Если роль не ADMIN (например, USER), отображаем сообщение о недоступности -->
-    <div th:if="${role != 'ROLE_ADMIN'}">
-        <p>У вас нет прав доступа к этой странице.</p>
+    <div class="no-access" th:if="${role != 'ROLE_ADMIN'}">
+        ⛔ У вас нет прав доступа к этой странице.
     </div>
 
-    <a href="/auth/home" class="btn btn-secondary">Назад</a>
+    <div class="text-center">
+        <a href="/auth/home" class="back-button">⬅ Назад</a>
+    </div>
 </div>
 
 </body>
