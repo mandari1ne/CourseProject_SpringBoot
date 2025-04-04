@@ -26,7 +26,7 @@ public class UserService {
             throw new IllegalArgumentException("❌ Пользователь с таким логином уже существует!");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Хешируем пароль
         user.setRole(USER); // Устанавливаем роль по умолчанию
         user.setStatus(ACTIVE); // Устанавливаем статус по умолчанию
         return userRepository.save(user);
