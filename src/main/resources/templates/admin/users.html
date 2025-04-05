@@ -174,6 +174,26 @@
             }
         }
 
+        function deleteUser(userId) {
+            if (confirm("Вы уверены, что хотите удалить пользователя?")) {
+                fetch(`/admin/delete-user/${userId}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("Пользователь успешно удален!");
+                            window.location.reload();
+                        } else {
+                            alert("Ошибка при удалении пользователя.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Ошибка:", error);
+                        alert("Произошла ошибка при удалении.");
+                    });
+            }
+        }
+
     </script>
 </head>
 <body>
@@ -244,6 +264,7 @@
                     <td th:text="${user.userInfo?.email ?: ''}"></td>
                     <td>
                         <button class="btn btn-primary btn-sm mb-1" th:onclick="'updateUserStatusAndRole(' + ${user.id} + ')'">Сохранить</button>
+                        <button class="btn btn-danger btn-sm" th:onclick="'deleteUser(' + ${user.id} + ')'">Удалить</button>
                     </td>
                 </tr>
                 </tbody>

@@ -57,4 +57,11 @@ public class AdminController {
 
         return ResponseEntity.ok("Изменения успешно сохранены!");
     }
+
+    @DeleteMapping("/delete-user/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteById(id);
+        return ResponseEntity.ok("Пользователь удален");
+    }
+
 }
