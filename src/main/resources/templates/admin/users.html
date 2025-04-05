@@ -8,7 +8,7 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #667eea, #764ba2); /* Цвета из login.html */
+            background: linear-gradient(135deg, #667eea, #764ba2);
             font-family: 'Segoe UI', sans-serif;
         }
 
@@ -55,15 +55,17 @@
         }
 
         .table th:nth-child(3),
-        .table th:nth-child(4) {
-            width: 160px;
+        .table td:nth-child(3),
+        .table th:nth-child(4),
+        .table td:nth-child(4) {
+            width: 120px;
         }
 
         .form-select {
             border-radius: 8px;
             font-size: 0.8rem;
             padding: 4px 6px;
-            width: 100%;
+            width: auto;
             min-width: 130px;
         }
 
@@ -120,6 +122,58 @@
 
         .back-button:hover {
             background: linear-gradient(135deg, #ff4b2b, #ff416c);
+        }
+
+        .register-button-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            gap: 10px;
+        }
+
+        .register-button {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+
+        .register-button:hover {
+            background: linear-gradient(135deg, #ff4b2b, #ff416c);
+        }
+
+        .department-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-select {
+            border-radius: 8px;
+            font-size: 0.85rem;
+            padding: 4px 6px;
+            width: 80%;
+            min-width: 120px;
+            background-color: #ffffff;
+            border: 2px solid #6a11cb;
+            color: #6a11cb;
+            transition: all 0.3s ease;
+            height: auto;
+        }
+
+        .form-select:hover {
+            background-color: #f3f3f3;
+            border-color: #2575fc;
+        }
+
+        .form-select:focus {
+            background-color: #ffffff;
+            border-color: #2575fc;
+            outline: none;
         }
     </style>
 
@@ -202,22 +256,27 @@
     <h2 class="text-center">👥 Список пользователей</h2>
 
     <div class="table-container" th:if="${role == 'ROLE_ADMIN'}">
-        <div class="mb-3 d-flex justify-content-end">
-            <label class="text-white me-2 fw-semibold" for="departmentFilter">Фильтр по отделу:</label>
-            <select id="departmentFilter" class="form-select w-auto" onchange="filterByDepartment()">
-                <option value="all">Все отделы</option>
-                <option value="Development">Development</option>
-                <option value="QA">QA</option>
-                <option value="DevOps">DevOps</option>
-                <option value="Support">Support</option>
-                <option value="Managment">Managment</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Desing">Desing</option>
-                <option value="HR">HR</option>
-                <option value="Sales">Sales</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Finance">Finance</option>
-            </select>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="register-button-container">
+                <a href="/admin/register" class="register-button">➕ Зарегистрировать нового пользователя</a>
+            </div>
+            <div class="department-filter-container">
+                <label class="text-white me-2 fw-semibold" for="departmentFilter">Фильтр по отделу:</label>
+                <select id="departmentFilter" class="form-select" onchange="filterByDepartment()">
+                    <option value="all">Все отделы</option>
+                    <option value="Development">Development</option>
+                    <option value="QA">QA</option>
+                    <option value="DevOps">DevOps</option>
+                    <option value="Support">Support</option>
+                    <option value="Managment">Managment</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Desing">Desing</option>
+                    <option value="HR">HR</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Finance">Finance</option>
+                </select>
+            </div>
         </div>
 
         <div class="table-responsive">

@@ -1,6 +1,7 @@
 package org.example.kursach.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.kursach.model.Role;
 import org.example.kursach.model.Status;
 import org.example.kursach.model.User;
 import org.example.kursach.model.UserInfo;
@@ -76,6 +77,31 @@ public class UserService {
         existingUserInfo.setUser(existingUser);
 
         userRepository.save(existingUser);
+    }
+
+    public void registerNewUserWithInfo(String login, String password, String roleStr,
+                                        String surname, String name, String patronymic,
+                                        String department, String position, String email) {
+        Role role = Role.valueOf(roleStr.toUpperCase());
+
+        User user = new User();
+        user.setLogin(login);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setStatus(Status.ACTIVE);
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setSurname(surname);
+        userInfo.setName(name);
+        userInfo.setPatronymic(patronymic);
+        userInfo.setDepartment(department);
+        userInfo.setPosition(position);
+        userInfo.setEmail(email);
+
+        userInfo.setUser(user);
+        user.setUserInfo(userInfo);
+
+        userRepository.save(user);
     }
 
 }
