@@ -9,7 +9,7 @@ public class VacationDays {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", nullable = false)
     private User employee;
 
@@ -91,5 +91,21 @@ public class VacationDays {
     public void setUsedUnpaidDays(int usedUnpaidDays) {
         this.usedUnpaidDays = usedUnpaidDays;
         updateAvailableDays();
+    }
+
+    public User getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(User employee) {
+        this.employee = employee;
+    }
+
+    public int getTotalDays() {
+        return totalDays;
+    }
+
+    public void setTotalDays(int totalDays) {
+        this.totalDays = totalDays;
     }
 }

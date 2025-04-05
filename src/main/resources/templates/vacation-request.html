@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="container">
+  <h2>Подача заявки на отпуск</h2>
+  <form action="#" th:action="@{/auth/vacation-request}" method="post">
+    <div class="form-group">
+      <label for="startDate">Дата начала</label>
+      <input type="date" id="startDate" name="startDate" class="form-control" required />
+    </div>
+    <div class="form-group">
+      <label for="endDate">Дата окончания</label>
+      <input type="date" id="endDate" name="endDate" class="form-control" required />
+    </div>
+    <div class="form-group">
+      <label for="vacationType">Тип отпуска</label>
+      <select id="vacationType" name="vacationType" class="form-control">
+        <option value="PAID">Оплачиваемый</option>
+        <option value="UNPAID">Неоплачиваемый</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить заявку</button>
+  </form>
+</div>
+
+
+</body>
+</html>

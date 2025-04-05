@@ -1,23 +1,29 @@
 package org.example.kursach.controllers;
 
-import org.example.kursach.model.User;
-import org.example.kursach.model.UserInfo;
+import org.example.kursach.model.*;
 import org.example.kursach.services.UserService;
+import org.example.kursach.services.VacationDaysService;
+import org.example.kursach.services.VacationRequestService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
     private final UserService userService;
+    private final VacationRequestService vacationRequestService;
+    private final VacationDaysService vacationDaysService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, VacationRequestService vacationRequestService, VacationDaysService vacationDaysService) {
         this.userService = userService;
+        this.vacationRequestService = vacationRequestService;
+        this.vacationDaysService = vacationDaysService;
     }
 
     @GetMapping("/register")
@@ -93,6 +99,57 @@ public class AuthController {
     public String updateProfile(@ModelAttribute User updatedUser, @ModelAttribute UserInfo updatedUserInfo, Principal principal) {
         userService.updateUser(principal.getName(), updatedUser, updatedUserInfo);
         return "redirect:/auth/profile";
+    }
+
+    // Страница с заявками на отпуск
+    @GetMapping("/vacation-requests")
+    public String showVacationRequests(Model model, Principal principal) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        List<VacationRequest> vacationRequests = vacationRequestService.findByEmployee(user);
+        model.addAttribute("vacationRequests", vacationRequests);
+
+        return "vacation-requests";  // Отображаем шаблон для списка заявок
+    }
+
+    // Страница для подачи новой заявки на отпуск
+    @GetMapping("/vacation-request")
+    public String showVacationRequestForm(Model model, Principal principal) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        // Получаем информацию о днях отпуска, если она не найдена, то создаем дефолтные данные
+        VacationDays vacationDays = vacationDaysService.getVacationDaysByUser(user);
+        model.addAttribute("vacationDays", vacationDays);
+        model.addAttribute("vacationRequest", new VacationRequest());
+
+        return "vacation-request";  // Отображаем шаблон для создания заявки
+    }
+
+
+    // Обработка отправки заявки на отпуск
+    @PostMapping("/vacation-request")
+    public String submitVacationRequest(@ModelAttribute VacationRequest vacationRequest, Principal principal, Model model) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        VacationDays vacationDays = vacationDaysService.getVacationDaysByUser(user);
+
+        // Проверяем доступность отпуска
+        if (!vacationRequest.isVacationTypeAvailable(vacationDays)) {
+            model.addAttribute("error", "Недостаточно дней отпуска.");
+            return "vacation-request";
+        }
+
+        vacationRequest.setEmployee(user);
+        vacationRequest.setStatus(VacationStatus.PENDING);
+
+        vacationRequestService.save(vacationRequest);
+        return "redirect:/auth/vacation-requests";
     }
 
 }

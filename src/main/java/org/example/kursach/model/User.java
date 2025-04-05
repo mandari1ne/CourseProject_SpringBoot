@@ -63,4 +63,12 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return status == Status.ACTIVE;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

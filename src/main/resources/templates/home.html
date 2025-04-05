@@ -76,8 +76,12 @@
 
                 <!-- Для обычного пользователя -->
                 <div th:if="${role == 'USER'}">
-                    <button class="btn btn-secondary w-100 mb-3">Просмотр заявок на отпуск</button>
-                    <button class="btn btn-primary w-100">Добавить заявку на отпуск</button>
+                    <a th:href="@{/auth/vacation-requests}" class="btn btn-secondary w-100 mb-3">
+                        Просмотр заявок на отпуск
+                    </a>
+                    <a th:href="@{/auth/vacation-request}" class="btn btn-primary w-100">
+                        Добавить заявку на отпуск
+                    </a>
                 </div>
 
                 <!-- Для администратора -->
