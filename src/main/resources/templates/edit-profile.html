@@ -100,6 +100,16 @@
             gap: 10px;
             margin-top: 20px;
         }
+
+        select.form-control.custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D'%236a11cb'%20height%3D'24'%20viewBox%3D'0%200%2024%2024'%20width%3D'24'%20xmlns%3D'http%3A//www.w3.org/2000/svg'%3E%3Cpath%20d%3D'M7%2010l5%205%205-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -127,9 +137,22 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="department" class="form-label">Отдел</label>
-                <input type="text" name="department" class="form-control" id="department" placeholder="Отдел"
-                       th:value="${userInfo.department != null ? userInfo.department : ''}">
+                <select name="department" class="form-control custom-select" id="department" required>
+                    <option value="" disabled th:if="${userInfo.department == null}" selected>Выберите отдел</option>
+                    <option value="Development" th:selected="${userInfo.department == 'Development'}">Development</option>
+                    <option value="QA" th:selected="${userInfo.department == 'QA'}">QA</option>
+                    <option value="DevOps" th:selected="${userInfo.department == 'DevOps'}">DevOps</option>
+                    <option value="Support" th:selected="${userInfo.department == 'Support'}">Support</option>
+                    <option value="Managment" th:selected="${userInfo.department == 'Managment'}">Managment</option>
+                    <option value="Data Science" th:selected="${userInfo.department == 'Data Science'}">Data Science</option>
+                    <option value="Desing" th:selected="${userInfo.department == 'Desing'}">Desing</option>
+                    <option value="HR" th:selected="${userInfo.department == 'HR'}">HR</option>
+                    <option value="Sales" th:selected="${userInfo.department == 'Sales'}">Sales</option>
+                    <option value="Marketing" th:selected="${userInfo.department == 'Marketing'}">Marketing</option>
+                    <option value="Finance" th:selected="${userInfo.department == 'Finance'}">Finance</option>
+                </select>
             </div>
+
             <div class="form-group">
                 <label for="position" class="form-label">Должность</label>
                 <input type="text" name="position" class="form-control" id="position" placeholder="Должность"
