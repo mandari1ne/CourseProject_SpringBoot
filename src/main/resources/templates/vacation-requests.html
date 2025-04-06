@@ -33,19 +33,25 @@
         .table {
             background-color: white;
             border-radius: 10px;
-            overflow: hidden;
+            border: 2px solid #5a5a89;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #5a5a89;
         }
 
         .table th {
             background-color: #6a11cb;
             color: white;
-            text-align: center;
-            vertical-align: middle;
         }
 
         .table td {
-            text-align: center;
-            vertical-align: middle;
+            background-color: #f9f9f9;
         }
 
         .btn-primary {
@@ -100,8 +106,7 @@
             <td th:text="${vacationRequest.endDate}"></td>
             <td th:text="${vacationRequest.vacationType == 'PAID' ? 'Оплачиваемый' : 'Неоплачиваемый'}"></td>
             <td th:text="${vacationRequest.status}"
-                th:class="'status-' + ${vacationRequest.status}">
-            </td>
+                th:class="'status-' + ${vacationRequest.status}"></td>
         </tr>
         </tbody>
     </table>
