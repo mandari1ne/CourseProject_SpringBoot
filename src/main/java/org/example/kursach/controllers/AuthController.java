@@ -140,7 +140,7 @@ public class AuthController {
 
 
     // Обработка отправки заявки на отпуск
-    @PostMapping("/auth/vacation-request")
+    @PostMapping("/vacation-request")
     public String submitVacationRequest(@ModelAttribute VacationRequest vacationRequest,
                                         @AuthenticationPrincipal UserDetails userDetails,
                                         Model model) {
@@ -149,13 +149,42 @@ public class AuthController {
 
         try {
             vacationService.submitRequest(user, vacationRequest);
-            return "redirect:/auth/home";
+            return "redirect:/auth/vacation-requests";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("vacationRequest", vacationRequest);
             model.addAttribute("vacationDays", vacationService.getVacationDays(user));
             return "vacation-request";
         }
+    }
+
+    // Удаление заявки на отпуск
+    @PostMapping("/vacation-request/delete/{id}")
+    public String deleteVacationRequest(@PathVariable Long id, Principal principal, Model model) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        Optional<VacationRequest> vacationRequestOpt = vacationRequestService.findById(id);
+
+        if (vacationRequestOpt.isPresent()) {
+            VacationRequest vacationRequest = vacationRequestOpt.get();
+
+            // Проверка статуса заявки
+            if (vacationRequest.getStatus() == VacationStatus.PENDING) {
+                vacationRequestService.delete(vacationRequest);
+                model.addAttribute("success", "✅ Заявка на отпуск успешно удалена!");
+            } else {
+                model.addAttribute("error", "❌ Вы не можете удалить заявку, так как ее статус не 'Ожидает'.");
+            }
+        } else {
+            model.addAttribute("error", "❌ Заявка не найдена.");
+        }
+
+        // Перенаправление на страницу с заявками
+        List<VacationRequest> vacationRequests = vacationRequestService.findByEmployee(user);
+        model.addAttribute("vacationRequests", vacationRequests);
+        return "vacation-requests";
     }
 
 }

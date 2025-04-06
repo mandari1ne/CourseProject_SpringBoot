@@ -6,6 +6,7 @@ import org.example.kursach.repositories.VacationRequestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VacationRequestService {
@@ -24,5 +25,14 @@ public class VacationRequestService {
     // Получение заявок по пользователю
     public List<VacationRequest> findByEmployee(User employee) {
         return vacationRequestRepository.findByEmployee(employee);
+    }
+
+    public Optional<VacationRequest> findById(Long id) {
+        return vacationRequestRepository.findById(id);
+    }
+
+    // Удаление заявки
+    public void delete(VacationRequest vacationRequest) {
+        vacationRequestRepository.delete(vacationRequest);
     }
 }
