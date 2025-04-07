@@ -44,4 +44,29 @@ public class VacationService {
             throw new IllegalArgumentException("❌ У вас недостаточно неоплачиваемых дней отпуска.");
         }
     }
+
+    public void updateVacationRequest(User user, VacationRequest updatedRequest) {
+        VacationRequest existingRequest = vacationRequestRepository.findById(updatedRequest.getId())
+                .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+
+        if (!existingRequest.getEmployee().getId().equals(user.getId())) {
+            throw new RuntimeException("У вас нет прав на редактирование этой заявки");
+        }
+
+        if (existingRequest.getStatus() != VacationStatus.PENDING) {
+            throw new RuntimeException("Можно редактировать только заявки со статусом 'PENDING'");
+        }
+
+        // Валидация нового запроса
+        updatedRequest.setEmployee(user); // для корректной валидации
+        validateVacationRequest(user, updatedRequest);
+
+        // Обновление данных
+        existingRequest.setStartDate(updatedRequest.getStartDate());
+        existingRequest.setEndDate(updatedRequest.getEndDate());
+        existingRequest.setVacationType(updatedRequest.getVacationType());
+
+        vacationRequestRepository.save(existingRequest);
+    }
+
 }

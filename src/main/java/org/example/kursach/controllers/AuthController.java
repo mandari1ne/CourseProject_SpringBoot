@@ -27,8 +27,7 @@ public class AuthController {
     public AuthController(UserService userService,
                           VacationRequestService vacationRequestService,
                           VacationDaysService vacationDaysService,
-                          VacationService vacationService)
-    {
+                          VacationService vacationService) {
         this.userService = userService;
         this.vacationRequestService = vacationRequestService;
         this.vacationDaysService = vacationDaysService;
@@ -185,6 +184,52 @@ public class AuthController {
         List<VacationRequest> vacationRequests = vacationRequestService.findByEmployee(user);
         model.addAttribute("vacationRequests", vacationRequests);
         return "vacation-requests";
+    }
+
+    @GetMapping("/vacation-request/edit/{id}")
+    public String showEditVacationRequestForm(@PathVariable Long id, Model model, Principal principal) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        VacationRequest request = vacationRequestService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+
+        if (!request.getEmployee().getId().equals(user.getId())) {
+            throw new RuntimeException("Вы не можете редактировать чужую заявку");
+        }
+
+        if (request.getStatus() != VacationStatus.PENDING) {
+            throw new RuntimeException("Можно редактировать только заявки со статусом 'Ожидает'");
+        }
+
+        VacationDays vacationDays = vacationDaysService.getVacationDaysByUser(user);
+
+        model.addAttribute("vacationRequest", request);
+        model.addAttribute("vacationDays", vacationDays);
+
+        return "edit-vacation-request";
+    }
+
+    @PostMapping("/vacation-request/edit/{id}")
+    public String updateVacationRequest(@PathVariable Long id,
+                                        @ModelAttribute VacationRequest updatedRequest,
+                                        Principal principal,
+                                        Model model) {
+        String login = principal.getName();
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
+
+        try {
+            updatedRequest.setId(id); // важно!
+            vacationService.updateVacationRequest(user, updatedRequest);
+            return "redirect:/auth/vacation-requests";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("vacationRequest", updatedRequest);
+            model.addAttribute("vacationDays", vacationService.getVacationDays(user));
+            return "edit-vacation-request";
+        }
     }
 
 }

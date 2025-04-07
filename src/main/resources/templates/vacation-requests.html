@@ -20,7 +20,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 1100px;
-            margin: 20px auto 0; /* Отступ сверху */
+            margin: 20px auto 0;
         }
 
         h2 {
@@ -72,6 +72,42 @@
             background: linear-gradient(135deg, #2575fc, #6a11cb);
         }
 
+        .btn-sm {
+            padding: 5px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            width: 60px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .btn-outline-primary {
+            color: #6a11cb;
+            border: 2px solid #6a11cb;
+            background-color: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #6a11cb;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            background-color: transparent;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
         .status-APPROVED {
             color: green;
             font-weight: bold;
@@ -87,15 +123,14 @@
             font-weight: bold;
         }
 
-        .btn-danger {
-            padding: 6px 12px;
-            font-size: 14px;
-        }
-
         .button-group {
             position: absolute;
             top: 20px;
             left: 20px;
+        }
+
+        .d-flex {
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -126,11 +161,19 @@
             <td th:text="${#strings.trim(vacationRequest.vacationType) == 'PAID' ? 'Оплачиваемый' : 'Неоплачиваемый'}"></td>
             <td th:text="${vacationRequest.status}" th:class="'status-' + ${vacationRequest.status}"></td>
             <td>
-                <form th:action="@{/auth/vacation-request/delete/{id}(id=${vacationRequest.id})}" method="post">
-                    <button type="submit" class="btn btn-danger"
-                            th:if="${#strings.trim(vacationRequest.status) == 'PENDING'}">Удалить
-                    </button>
-                </form>
+                <div class="d-flex justify-content-center gap-2">
+                    <a th:href="@{/auth/vacation-request/edit/{id}(id=${vacationRequest.id})}"
+                       class="btn btn-sm btn-outline-primary"
+                       th:if="${#strings.trim(vacationRequest.status) == 'PENDING'}">
+                        ✏️
+                    </a>
+                    <form th:action="@{/auth/vacation-request/delete/{id}(id=${vacationRequest.id})}"
+                          method="post" th:if="${#strings.trim(vacationRequest.status) == 'PENDING'}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            🗑️
+                        </button>
+                    </form>
+                </div>
             </td>
         </tr>
         </tbody>
