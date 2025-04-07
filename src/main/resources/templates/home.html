@@ -92,6 +92,13 @@
                     <button class="btn btn-primary w-100 mb-3">Просмотр заявок на отпуск</button>
                 </div>
 
+                <!-- Для менеджера -->
+                <div th:if="${role == 'MANAGER'}">
+                    <a th:href="@{/manager/vacation-requests}" class="btn btn-secondary w-100 mb-3">
+                        Просмотр заявок на отпуск
+                    </a>
+                </div>
+
                 <a th:href="@{/logout}" class="logout">Выйти</a>
             </div>
         </div>

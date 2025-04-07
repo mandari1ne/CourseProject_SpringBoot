@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers(new MvcRequestMatcher(introspector, "/auth/register"),
                                 new MvcRequestMatcher(introspector, "/auth/login")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/admin/**")).hasRole("ADMIN")
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/manager/**")).hasRole("MANAGER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заявки на отпуск отдела</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto 0;
+        }
+
+        h2 {
+            color: #6a11cb;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            background-color: white;
+            border-radius: 10px;
+            border: 2px solid #5a5a89;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .table th, .table td {
+            padding: 8px 10px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #5a5a89;
+            word-wrap: break-word;
+            max-width: 200px;
+        }
+
+        .table th {
+            background-color: #6a11cb;
+            color: white;
+        }
+
+        .table td {
+            background-color: #f9f9f9;
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 10px;
+            width: 60px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .btn-outline-success {
+            color: #28a745;
+            border: 2px solid #28a745;
+        }
+
+        .btn-outline-success:hover {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .status-APPROVED {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-REJECTED {
+            color: red;
+            font-weight: bold;
+        }
+
+        .status-PENDING {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .button-group {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .d-flex {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="button-group">
+        <a th:href="@{/auth/home}" class="btn btn-primary">← Назад</a>
+    </div>
+
+    <h2>Заявки на отпуск сотрудников отдела</h2>
+
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>ФИО сотрудника</th>
+            <th>Должность</th>
+            <th>Тип отпуска</th>
+            <th>Дата начала</th>
+            <th>Дата окончания</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="request : ${vacationRequests}">
+            <td th:text="${request.employee.userInfo.surname + ' ' + request.employee.userInfo.name + ' ' + request.employee.userInfo.patronymic}">ФИО</td>
+            <td th:text="${request.employee.userInfo.position}">Должность</td>
+            <td th:text="${request.vacationType}">Тип</td>
+            <td th:text="${request.startDate}">Начало</td>
+            <td th:text="${request.endDate}">Конец</td>
+            <td th:text="${request.status}" th:class="'status-' + ${request.status}">Статус</td>
+            <td>
+<!--                <div class="d-flex justify-content-center gap-2" th:if="${request.status == 'PENDING'}">-->
+<!--                    <form th:action="@{'/vacation/approve/' + ${request.id}}" method="post">-->
+<!--                        <button type="submit" class="btn btn-sm btn-outline-success">✔</button>-->
+<!--                    </form>-->
+<!--                    <form th:action="@{'/vacation/reject/' + ${request.id}}" method="post">-->
+<!--                        <button type="submit" class="btn btn-sm btn-outline-danger">✖</button>-->
+<!--                    </form>-->
+<!--                </div>-->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

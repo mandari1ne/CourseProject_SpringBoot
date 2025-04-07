@@ -35,4 +35,8 @@ public class VacationRequestService {
     public void delete(VacationRequest vacationRequest) {
         vacationRequestRepository.delete(vacationRequest);
     }
+
+    public List<VacationRequest> getRequestsByDepartment(String department) {
+        return vacationRequestRepository.findAllByEmployeeDepartment(department);
+    }
 }
