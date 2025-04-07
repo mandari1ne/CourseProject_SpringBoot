@@ -24,6 +24,14 @@ public class VacationDays {
     private int availablePaidDays;  // Доступные оплачиваемые дни
     private int availableUnpaidDays; // Доступные неоплачиваемые дни
 
+    public void setAvailablePaidDays(int availablePaidDays) {
+        this.availablePaidDays = availablePaidDays;
+    }
+
+    public void setAvailableUnpaidDays(int availableUnpaidDays) {
+        this.availableUnpaidDays = availableUnpaidDays;
+    }
+
     // Метод для обновления доступных дней отпуска
     public void updateAvailableDays() {
         this.availablePaidDays = paidDays - usedPaidDays;
