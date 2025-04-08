@@ -171,6 +171,7 @@
                 <div class="form-group">
                     <label for="vacationType">Тип отпуска</label>
                     <select id="vacationType" name="vacationType" class="form-control form-select" required>
+                        <option value="" disabled selected>Выберите тип отпуска</option>
                         <option value="PAID" th:selected="${vacationRequest.vacationType == 'PAID'}">Оплачиваемый
                         </option>
                         <option value="UNPAID" th:selected="${vacationRequest.vacationType == 'UNPAID'}">
