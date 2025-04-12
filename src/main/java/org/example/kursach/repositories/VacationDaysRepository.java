@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface VacationDaysRepository extends JpaRepository<VacationDays, Long> {
     Optional<VacationDays> findByEmployee(User employee);
+    Optional<VacationDays> findByEmployeeId(Long userId);
 }

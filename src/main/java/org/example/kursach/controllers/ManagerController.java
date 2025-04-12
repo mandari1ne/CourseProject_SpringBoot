@@ -1,7 +1,9 @@
 package org.example.kursach.controllers;
 
 import org.example.kursach.model.User;
+import org.example.kursach.model.VacationDays;
 import org.example.kursach.model.VacationRequest;
+import org.example.kursach.model.VacationStatus;
 import org.example.kursach.services.UserService;
 import org.example.kursach.services.VacationRequestService;
 import org.springframework.stereotype.Controller;
@@ -59,4 +61,37 @@ public class ManagerController {
         vacationRequestService.rejectVacationRequest(id);
         return "redirect:/manager/vacation-requests";
     }
+
+    @GetMapping("/vacation-requests/edit/{id}")
+    public String editVacationRequest(@PathVariable Long id, Model model) {
+        VacationRequest request = vacationRequestService.getById(id); // теперь метод существует
+        if (request.getStatus() != VacationStatus.PENDING) {
+            throw new RuntimeException("Редактировать можно только необработанные заявки.");
+        }
+
+        Long userId = request.getEmployee().getId();
+        VacationDays vacationDays = vacationRequestService.getVacationDaysByUserId(userId);
+        vacationDays.updateAvailableDays();
+
+        model.addAttribute("request", request);
+        model.addAttribute("vacationDays", vacationDays);
+
+        return "manager/edit-vacation-request";
+    }
+
+    @PostMapping("/vacation-requests/edit/{id}")
+    public String updateVacationRequest(
+            @PathVariable Long id,
+            VacationRequest updatedRequest,
+            RedirectAttributes redirectAttributes) {
+        try {
+            vacationRequestService.updateVacationRequest(id, updatedRequest);
+            redirectAttributes.addFlashAttribute("success", "Заявка обновлена");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка: " + e.getMessage());
+        }
+
+        return "redirect:/manager/vacation-requests";
+    }
+
 }

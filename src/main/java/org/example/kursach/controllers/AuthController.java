@@ -221,7 +221,7 @@ public class AuthController {
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + login));
 
         try {
-            updatedRequest.setId(id); // важно!
+            updatedRequest.setId(id);
             vacationService.updateVacationRequest(user, updatedRequest);
             return "redirect:/auth/vacation-requests";
         } catch (IllegalArgumentException e) {
