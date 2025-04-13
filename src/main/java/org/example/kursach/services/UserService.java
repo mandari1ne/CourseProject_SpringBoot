@@ -22,6 +22,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public List<User> getUsersByDepartment(String department) {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getUserInfo() != null)
+                .filter(user -> department.equals(user.getUserInfo().getDepartment()))
+                .toList();
+    }
+
     public User registerUser(User user) {
         if (userRepository.findByLogin(user.getLogin()).isPresent()) {
             throw new IllegalArgumentException("❌ Пользователь с таким логином уже существует!");

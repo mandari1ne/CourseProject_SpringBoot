@@ -21,6 +21,15 @@ public class VacationRequestService {
         this.vacationDaysRepository = vacationDaysRepository;
     }
 
+    public int getUsedVacationDays(Long userId) {
+        List<VacationRequest> approvedRequests = vacationRequestRepository
+                .findByEmployeeIdAndStatus(userId, VacationStatus.APPROVED);
+
+        return approvedRequests.stream()
+                .mapToInt(req -> (int) (req.getEndDate().toEpochDay() - req.getStartDate().toEpochDay()) + 1)
+                .sum();
+    }
+
     public VacationRequest getById(Long id) {
         return vacationRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Заявка не найдена"));

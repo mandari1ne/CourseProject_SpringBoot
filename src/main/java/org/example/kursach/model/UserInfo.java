@@ -23,4 +23,8 @@ public class UserInfo {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public String getFullName() {
+        return String.format("%s %s %s", surname, name, patronymic);
+    }
 }

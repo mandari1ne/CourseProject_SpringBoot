@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/manager")
@@ -92,6 +94,39 @@ public class ManagerController {
         }
 
         return "redirect:/manager/vacation-requests";
+    }
+
+    @GetMapping("/vacation-report")
+    public String vacationReport(Model model, Principal principal) {
+        User manager = userService.findByLogin(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        String department = manager.getUserInfo().getDepartment();
+
+        List<User> employees = userService.getUsersByDepartment(department).stream()
+                .filter(user -> !user.getId().equals(manager.getId()))
+                .toList();
+
+        List<Map<String, Object>> reportItems = employees.stream().map(user -> {
+            VacationDays vacationDays = vacationRequestService.getVacationDaysByUserId(user.getId());
+            vacationDays.updateAvailableDays();
+
+            int used = vacationRequestService.getUsedVacationDays(user.getId());
+            int total = vacationDays.getTotalDays();
+            int availablePaid = vacationDays.getAvailablePaidDays();
+            int availableUnpaid = vacationDays.getAvailableUnpaidDays();
+
+            Map<String, Object> item = new HashMap<>();
+            item.put("name", user.getUserInfo().getFullName());
+            item.put("used", used);
+            item.put("total", total);
+            item.put("availablePaid", availablePaid);
+            item.put("availableUnpaid", availableUnpaid);
+            return item;
+        }).toList();
+
+        model.addAttribute("reportItems", reportItems);
+        return "manager/vacation-report";
     }
 
 }
