@@ -16,7 +16,7 @@
 
         .card {
             background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
+            padding: 1rem 2rem 2rem 2rem;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             width: 100%;
@@ -25,15 +25,24 @@
         }
 
         .button-group {
-            display: inline-block;
-            margin-bottom: -30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 0;
+            align-items: flex-start;
+        }
+
+        .button-group .btn {
+            min-width: 180px;
+            text-align: center;
         }
 
         h2 {
             color: #6a11cb;
             text-align: center;
             margin-bottom: 10px;
-            padding-top: 5px;
+            margin-top: -55px;
+            padding-top: 0;
         }
 
         .table {
@@ -113,8 +122,13 @@
 <body>
 
 <div class="card">
-    <div class="button-group">
-        <a th:href="@{/manager/vacation-requests}" class="btn btn-primary">← Назад к заявкам</a>
+    <div class="d-flex justify-content-between mb-3">
+        <a th:href="@{/manager/vacation-requests}" class="btn btn-primary">
+            ← Назад к заявкам
+        </a>
+        <a href="/manager/vacation-report/export" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Экспорт в Excel
+        </a>
     </div>
 
     <h2>Отчет по отпускам сотрудников отдела</h2>

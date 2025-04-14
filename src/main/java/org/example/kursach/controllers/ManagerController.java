@@ -1,5 +1,11 @@
 package org.example.kursach.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.kursach.model.User;
 import org.example.kursach.model.VacationDays;
 import org.example.kursach.model.VacationRequest;
@@ -127,6 +133,59 @@ public class ManagerController {
 
         model.addAttribute("reportItems", reportItems);
         return "manager/vacation-report";
+    }
+
+    @GetMapping("/vacation-report/export")
+    public void exportVacationReportToExcel(HttpServletResponse response, Principal principal) throws Exception {
+        User manager = userService.findByLogin(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        String department = manager.getUserInfo().getDepartment();
+
+        List<User> employees = userService.getUsersByDepartment(department).stream()
+                .filter(user -> !user.getId().equals(manager.getId()))
+                .toList();
+
+        // Установка параметров ответа
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=vacation_report.xlsx");
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Отчет по отпускам");
+
+            // Заголовки
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Сотрудник", "Общее кол-во дней", "Использовано", "Доступно (оплач./неопл.)"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+
+            // Заполнение данными
+            int rowNum = 1;
+            for (User user : employees) {
+                VacationDays vacationDays = vacationRequestService.getVacationDaysByUserId(user.getId());
+                vacationDays.updateAvailableDays();
+
+                int used = vacationRequestService.getUsedVacationDays(user.getId());
+                int total = vacationDays.getTotalDays();
+                int availablePaid = vacationDays.getAvailablePaidDays();
+                int availableUnpaid = vacationDays.getAvailableUnpaidDays();
+
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(user.getUserInfo().getFullName());
+                row.createCell(1).setCellValue(total);
+                row.createCell(2).setCellValue(used);
+                row.createCell(3).setCellValue(availablePaid + " / " + availableUnpaid);
+            }
+
+            // Автоширина
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(response.getOutputStream());
+        }
     }
 
 }
