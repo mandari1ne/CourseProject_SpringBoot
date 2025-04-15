@@ -24,25 +24,12 @@
             margin: 10px auto 0;
         }
 
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 0;
-            align-items: flex-start;
-        }
-
-        .button-group .btn {
-            min-width: 180px;
-            text-align: center;
-        }
-
         h2 {
             color: #6a11cb;
-            text-align: center;
             margin-bottom: 10px;
-            margin-top: -55px;
             padding-top: 0;
+            flex-grow: 1; /* Это позволяет заголовку занимать доступное пространство */
+            text-align: center;
         }
 
         .table {
@@ -122,16 +109,21 @@
 <body>
 
 <div class="card">
-    <div class="d-flex justify-content-between mb-3">
+    <!-- Контейнер для заголовка и кнопок -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Кнопка слева -->
         <a th:href="@{/manager/vacation-requests}" class="btn btn-primary">
             ← Назад к заявкам
         </a>
+
+        <!-- Заголовок по центру -->
+        <h2>Отчет по отпускам сотрудников отдела</h2>
+
+        <!-- Кнопка справа -->
         <a href="/manager/vacation-report/export" class="btn btn-success">
             <i class="fas fa-file-excel"></i> Экспорт в Excel
         </a>
     </div>
-
-    <h2>Отчет по отпускам сотрудников отдела</h2>
 
     <div th:if="${error}" class="alert alert-danger"
          style="display: inline-block; max-width: 500px; width: auto; margin: 5px auto; text-align: center;"
