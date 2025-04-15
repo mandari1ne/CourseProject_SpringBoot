@@ -12,10 +12,7 @@ import org.example.kursach.services.VacationRequestService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -173,32 +170,50 @@ public class ManagerController {
     }
 
     @GetMapping("/vacation-report/export")
-    public void exportVacationReportToExcel(HttpServletResponse response, Principal principal) throws Exception {
-        User manager = userService.findByLogin(principal.getName())
+    public void exportVacationReportToExcel(@RequestParam(required = false) String departmentFilter,
+                                            HttpServletResponse response,
+                                            Principal principal) throws Exception {
+        User currentUser = userService.findByLogin(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        String department = manager.getUserInfo().getDepartment();
+        List<User> employees;
 
-        List<User> employees = userService.getUsersByDepartment(department).stream()
-                .filter(user -> !user.getId().equals(manager.getId()))
-                .toList();
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
 
-        // Установка параметров ответа
+        if (isAdmin) {
+            employees = userService.findAllUsersExcept(currentUser.getLogin());
+            if (departmentFilter != null && !departmentFilter.equalsIgnoreCase("all")) {
+                String filter = departmentFilter.toLowerCase();
+                employees = employees.stream()
+                        .filter(user -> user.getUserInfo().getDepartment().toLowerCase().contains(filter))
+                        .toList();
+            }
+        } else if (currentUser.getRole() == Role.MANAGER) {
+            String department = currentUser.getUserInfo().getDepartment();
+            employees = userService.getUsersByDepartment(department).stream()
+                    .filter(user -> !user.getId().equals(currentUser.getId()))
+                    .toList();
+        } else {
+            throw new AccessDeniedException("Нет доступа к отчету");
+        }
+
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=vacation_report.xlsx");
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Отчет по отпускам");
 
-            // Заголовки
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Сотрудник", "Общее кол-во дней", "Использовано", "Доступно (оплач./неопл.)"};
-            for (int i = 0; i < headers.length; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(headers[i]);
-            }
+            int col = 0;
 
-            // Заполнение данными
+            headerRow.createCell(col++).setCellValue("Сотрудник");
+            if (isAdmin) {
+                headerRow.createCell(col++).setCellValue("Отдел");
+            }
+            headerRow.createCell(col++).setCellValue("Общее кол-во дней");
+            headerRow.createCell(col++).setCellValue("Использовано");
+            headerRow.createCell(col).setCellValue("Доступно (оплач./неопл.)");
+
             int rowNum = 1;
             for (User user : employees) {
                 VacationDays vacationDays = vacationRequestService.getVacationDaysByUserId(user.getId());
@@ -210,14 +225,19 @@ public class ManagerController {
                 int availableUnpaid = vacationDays.getAvailableUnpaidDays();
 
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(user.getUserInfo().getFullName());
-                row.createCell(1).setCellValue(total);
-                row.createCell(2).setCellValue(used);
-                row.createCell(3).setCellValue(availablePaid + " / " + availableUnpaid);
+                int columnIndex = 0;
+
+                row.createCell(columnIndex++).setCellValue(user.getUserInfo().getFullName());
+                if (isAdmin) {
+                    row.createCell(columnIndex++).setCellValue(user.getUserInfo().getDepartment());
+                }
+                row.createCell(columnIndex++).setCellValue(total);
+                row.createCell(columnIndex++).setCellValue(used);
+                row.createCell(columnIndex).setCellValue(availablePaid + " / " + availableUnpaid);
             }
 
             // Автоширина
-            for (int i = 0; i < headers.length; i++) {
+            for (int i = 0; i <= (isAdmin ? 4 : 3); i++) {
                 sheet.autoSizeColumn(i);
             }
 

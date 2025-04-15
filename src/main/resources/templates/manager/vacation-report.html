@@ -119,26 +119,28 @@
         }
 
         document.addEventListener('DOMContentLoaded', filterReport);
+
+        function downloadExcel() {
+            const department = document.getElementById("departmentFilter")?.value || 'all';
+            window.location.href = `/manager/vacation-report/export?departmentFilter=${encodeURIComponent(department)}`;
+        }
     </script>
 
 </head>
 <body>
 
 <div class="card">
-    <!-- Контейнер для заголовка и кнопок -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <!-- Кнопка слева -->
         <a th:href="@{/manager/vacation-requests}" class="btn btn-primary">
             ← Назад к заявкам
         </a>
 
-        <!-- Заголовок по центру -->
         <h2>Отчет по отпускам сотрудников отдела</h2>
 
-        <!-- Кнопка справа -->
-        <a href="/manager/vacation-report/export" class="btn btn-success">
+        <button class="btn btn-success" onclick="downloadExcel()">
             <i class="fas fa-file-excel"></i> Экспорт в Excel
-        </a>
+        </button>
+
     </div>
 
     <div th:if="${isAdmin}" class="mb-3 d-flex align-items-center gap-3">
