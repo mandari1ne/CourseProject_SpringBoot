@@ -32,22 +32,6 @@ public class ManagerController {
         this.userService = userService;
     }
 
-//    @GetMapping("/vacation-requests")
-//    public String viewDepartmentVacationRequests(Model model, Principal principal) {
-//        // Получаем текущего менеджера
-//        User manager = userService.findByLogin(principal.getName())
-//                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-//
-//        // Получаем отдел менеджера
-//        String department = manager.getUserInfo().getDepartment();
-//
-//        // Получаем все заявки сотрудников из этого отдела через сервис
-//        List<VacationRequest> vacationRequests = vacationRequestService.getRequestsByDepartment(department);
-//
-//        model.addAttribute("vacationRequests", vacationRequests);
-//        return "manager/vacation-requests";
-//    }
-
     @GetMapping("/vacation-requests")
     public String viewVacationRequests(Model model, Principal principal) {
         // Получаем текущего пользователя
@@ -131,8 +115,10 @@ public class ManagerController {
         List<User> employees;
 
         if (currentUser.getRole() == Role.ADMIN) {
-            // Админ — все пользователи, кроме себя
-            employees = userService.findAllUsersExcept(currentUser.getLogin());
+            // Админ — все пользователи, кроме себя и менеджеров
+            employees = userService.findAllUsersExcept(currentUser.getLogin()).stream()
+                    .filter(user -> user.getRole() != Role.MANAGER)
+                    .toList();
             model.addAttribute("isAdmin", true);
         } else if (currentUser.getRole() == Role.MANAGER) {
             // Менеджер — только сотрудники своего отдела, кроме себя
