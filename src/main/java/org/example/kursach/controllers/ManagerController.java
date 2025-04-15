@@ -160,6 +160,7 @@ public class ManagerController {
 
             Map<String, Object> item = new HashMap<>();
             item.put("name", user.getUserInfo().getFullName());
+            item.put("department", user.getUserInfo().getDepartment());
             item.put("used", used);
             item.put("total", total);
             item.put("availablePaid", availablePaid);

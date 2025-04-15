@@ -105,6 +105,22 @@
             white-space: nowrap;
         }
     </style>
+
+    <script>
+        function filterReport() {
+            const departmentFilter = document.getElementById('departmentFilter').value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const deptCell = row.querySelector('.department-cell');
+                const dept = deptCell ? deptCell.textContent.trim().toLowerCase() : '';
+                row.style.display = departmentFilter === 'all' || dept.includes(departmentFilter) ? '' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', filterReport);
+    </script>
+
 </head>
 <body>
 
@@ -125,6 +141,24 @@
         </a>
     </div>
 
+    <div th:if="${isAdmin}" class="mb-3 d-flex align-items-center gap-3">
+        <label for="departmentFilter" class="fw-bold text-dark">Фильтр по отделу:</label>
+        <select id="departmentFilter" class="form-select w-auto" onchange="filterReport()">
+            <option value="all">Все отделы</option>
+            <option value="Development">Development</option>
+            <option value="QA">QA</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Support">Support</option>
+            <option value="Managment">Managment</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Design">Design</option>
+            <option value="HR">HR</option>
+            <option value="Sales">Sales</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Finance">Finance</option>
+        </select>
+    </div>
+
     <div th:if="${error}" class="alert alert-danger"
          style="display: inline-block; max-width: 500px; width: auto; margin: 5px auto; text-align: center;"
          th:text="${error}"></div>
@@ -136,6 +170,7 @@
         <thead>
         <tr>
             <th>Сотрудник</th>
+            <th th:if="${isAdmin}">Отдел</th>
             <th>Общее кол-во дней</th>
             <th>Использовано</th>
             <th>Доступно (оплач./неопл.)</th>
@@ -144,6 +179,7 @@
         <tbody>
         <tr th:each="item : ${reportItems}">
             <td th:text="${item.name}"></td>
+            <td th:if="${isAdmin}" th:text="${item.department}" class="department-cell"></td>
             <td th:text="${item.total}"></td>
             <td th:text="${item.used}"></td>
             <td>
