@@ -21,6 +21,10 @@ public class VacationRequestService {
         this.vacationDaysRepository = vacationDaysRepository;
     }
 
+    public List<VacationRequest> getAllRequests() {
+        return vacationRequestRepository.findAll();
+    }
+
     public int getUsedVacationDays(Long userId) {
         List<VacationRequest> approvedRequests = vacationRequestRepository
                 .findByEmployeeIdAndStatus(userId, VacationStatus.APPROVED);

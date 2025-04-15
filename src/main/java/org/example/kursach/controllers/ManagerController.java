@@ -6,12 +6,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.example.kursach.model.User;
-import org.example.kursach.model.VacationDays;
-import org.example.kursach.model.VacationRequest;
-import org.example.kursach.model.VacationStatus;
+import org.example.kursach.model.*;
 import org.example.kursach.services.UserService;
 import org.example.kursach.services.VacationRequestService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,21 +35,47 @@ public class ManagerController {
         this.userService = userService;
     }
 
+//    @GetMapping("/vacation-requests")
+//    public String viewDepartmentVacationRequests(Model model, Principal principal) {
+//        // Получаем текущего менеджера
+//        User manager = userService.findByLogin(principal.getName())
+//                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+//
+//        // Получаем отдел менеджера
+//        String department = manager.getUserInfo().getDepartment();
+//
+//        // Получаем все заявки сотрудников из этого отдела через сервис
+//        List<VacationRequest> vacationRequests = vacationRequestService.getRequestsByDepartment(department);
+//
+//        model.addAttribute("vacationRequests", vacationRequests);
+//        return "manager/vacation-requests";
+//    }
+
     @GetMapping("/vacation-requests")
-    public String viewDepartmentVacationRequests(Model model, Principal principal) {
-        // Получаем текущего менеджера
-        User manager = userService.findByLogin(principal.getName())
+    public String viewVacationRequests(Model model, Principal principal) {
+        // Получаем текущего пользователя
+        User currentUser = userService.findByLogin(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Получаем отдел менеджера
-        String department = manager.getUserInfo().getDepartment();
+        List<VacationRequest> vacationRequests;
 
-        // Получаем все заявки сотрудников из этого отдела через сервис
-        List<VacationRequest> vacationRequests = vacationRequestService.getRequestsByDepartment(department);
+        // Если администратор — показываем все заявки
+        if (currentUser.getRole() == Role.ADMIN) {
+            vacationRequests = vacationRequestService.getAllRequests();
+            model.addAttribute("isAdmin", true);
+        } else if (currentUser.getRole() == Role.MANAGER) {
+            // Если менеджер — только по отделу
+            String department = currentUser.getUserInfo().getDepartment();
+            vacationRequests = vacationRequestService.getRequestsByDepartment(department);
+            model.addAttribute("isAdmin", false);
+        } else {
+            throw new AccessDeniedException("У вас нет прав для просмотра заявок");
+        }
 
         model.addAttribute("vacationRequests", vacationRequests);
         return "manager/vacation-requests";
     }
+
 
     @PostMapping("/vacation-requests/{id}/approve")
     public String approveRequest(@PathVariable Long id, RedirectAttributes redirectAttributes) {
