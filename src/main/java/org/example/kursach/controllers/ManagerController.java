@@ -128,15 +128,27 @@ public class ManagerController {
 
     @GetMapping("/vacation-report")
     public String vacationReport(Model model, Principal principal) {
-        User manager = userService.findByLogin(principal.getName())
+        User currentUser = userService.findByLogin(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        String department = manager.getUserInfo().getDepartment();
+        List<User> employees;
 
-        List<User> employees = userService.getUsersByDepartment(department).stream()
-                .filter(user -> !user.getId().equals(manager.getId()))
-                .toList();
+        if (currentUser.getRole() == Role.ADMIN) {
+            // Админ — все пользователи, кроме себя
+            employees = userService.findAllUsersExcept(currentUser.getLogin());
+            model.addAttribute("isAdmin", true);
+        } else if (currentUser.getRole() == Role.MANAGER) {
+            // Менеджер — только сотрудники своего отдела, кроме себя
+            String department = currentUser.getUserInfo().getDepartment();
+            employees = userService.getUsersByDepartment(department).stream()
+                    .filter(user -> !user.getId().equals(currentUser.getId()))
+                    .toList();
+            model.addAttribute("isAdmin", false);
+        } else {
+            throw new AccessDeniedException("У вас нет прав для просмотра отчета");
+        }
 
+        // Формируем отчёт
         List<Map<String, Object>> reportItems = employees.stream().map(user -> {
             VacationDays vacationDays = vacationRequestService.getVacationDaysByUserId(user.getId());
             vacationDays.updateAvailableDays();
