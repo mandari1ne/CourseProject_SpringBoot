@@ -207,7 +207,8 @@
         <a th:href="@{/manager/vacation-report}" class="btn btn-primary">Отчет по отпускам</a>
     </div>
 
-    <h2>Заявки на отпуск сотрудников отдела</h2>
+    <h2 th:if="${!isAdmin}">Заявки на отпуск сотрудников отдела</h2>
+    <h2 th:if="${isAdmin}">Заявки на отпуск всех сотрудников</h2>
 
     <div class="filter-group">
         <!-- Фильтр по отделу -->
