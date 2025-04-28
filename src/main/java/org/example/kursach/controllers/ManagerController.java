@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.kursach.model.*;
 import org.example.kursach.services.UserService;
+import org.example.kursach.services.VacationDaysService;
 import org.example.kursach.services.VacationRequestService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -26,10 +27,14 @@ public class ManagerController {
 
     private final VacationRequestService vacationRequestService;
     private final UserService userService;
+    private final VacationDaysService vacationDaysService;
 
-    public ManagerController(VacationRequestService vacationRequestService, UserService userService) {
+    public ManagerController(VacationRequestService vacationRequestService,
+                             UserService userService,
+                             VacationDaysService vacationDaysService) {
         this.vacationRequestService = vacationRequestService;
         this.userService = userService;
+        this.vacationDaysService = vacationDaysService;
     }
 
     @GetMapping("/vacation-requests")
@@ -115,25 +120,26 @@ public class ManagerController {
         List<User> employees;
 
         if (currentUser.getRole() == Role.ADMIN) {
-            // Админ — все пользователи, кроме себя и менеджеров
             employees = userService.findAllUsersExcept(currentUser.getLogin()).stream()
                     .filter(user -> user.getRole() != Role.MANAGER)
+                    .filter(user -> user.getRole() != Role.ADMIN)
                     .toList();
             model.addAttribute("isAdmin", true);
         } else if (currentUser.getRole() == Role.MANAGER) {
-            // Менеджер — только сотрудники своего отдела, кроме себя
             String department = currentUser.getUserInfo().getDepartment();
             employees = userService.getUsersByDepartment(department).stream()
                     .filter(user -> !user.getId().equals(currentUser.getId()))
+                    .filter(user -> user.getRole() == Role.USER)  // только обычные пользователи
                     .toList();
             model.addAttribute("isAdmin", false);
         } else {
             throw new AccessDeniedException("У вас нет прав для просмотра отчета");
         }
 
+
         // Формируем отчёт
         List<Map<String, Object>> reportItems = employees.stream().map(user -> {
-            VacationDays vacationDays = vacationRequestService.getVacationDaysByUserId(user.getId());
+            VacationDays vacationDays = vacationDaysService.getVacationDaysByUser(user);  // исправил здесь
             vacationDays.updateAvailableDays();
 
             int used = vacationRequestService.getUsedVacationDays(user.getId());
@@ -174,10 +180,14 @@ public class ManagerController {
                         .filter(user -> user.getUserInfo().getDepartment().toLowerCase().contains(filter))
                         .toList();
             }
+            employees = employees.stream()
+                    .filter(user -> user.getRole() == Role.USER)  // исключаем админов и менеджеров
+                    .toList();
         } else if (currentUser.getRole() == Role.MANAGER) {
             String department = currentUser.getUserInfo().getDepartment();
             employees = userService.getUsersByDepartment(department).stream()
                     .filter(user -> !user.getId().equals(currentUser.getId()))
+                    .filter(user -> user.getRole() == Role.USER)  // оставляем только обычных сотрудников
                     .toList();
         } else {
             throw new AccessDeniedException("Нет доступа к отчету");
